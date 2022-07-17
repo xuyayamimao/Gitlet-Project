@@ -33,13 +33,22 @@ public class Repository {
                     " current directory.");
         }
         GITLET_DIR.mkdir();
+        File commits = join(GITLET_DIR, "commits");
+        commits.mkdir();
         Commit initial = new Commit();
         byte[] commit0 = serialize(initial);
         String uid = sha1(commit0);
-        String filename = uid + ".txt";
-        File initialcommit = join(CWD, ".gitlet/", filename);
+        String commmit0filename = uid + ".txt";
+        File initialcommit = join(commits, commmit0filename);
         writeObject(initialcommit, initial);
+        File HEAD = join(commits, "HEAD.txt");
+        File Main = join(commits, "Main.txt");
+        writeContents(Main, uid);
+        Head head0 = new Head(uid, "Main");
+        writeObject(HEAD, head0);
     }
+
+
 
 
 
