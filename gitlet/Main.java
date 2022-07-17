@@ -21,11 +21,13 @@ public class Main {
                 Repository.setupInit();
                 break;
             case "add":
+                validateNumArgs("add", args, 2);
                 gitletExist();
                 // TODO: handle the `add [filename]` command
                 break;
             // TODO: FILL THE REST IN
         }
+        exitWithError("No command with that name exists.");
     }
 
     public static void exitWithError(String message) {
