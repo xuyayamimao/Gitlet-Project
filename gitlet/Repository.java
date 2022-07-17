@@ -30,7 +30,7 @@ public class Repository {
     public static void setupInit(){
         if (GITLET_DIR.exists()){
             Main.exitWithError("A Gitlet version-control system already exists in the" +
-                    " current directory");
+                    " current directory.");
         }
         GITLET_DIR.mkdir();
         Commit initial = new Commit();
