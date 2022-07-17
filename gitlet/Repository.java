@@ -46,6 +46,12 @@ public class Repository {
         writeContents(Main, uid);
         Head head0 = new Head(uid, "Main");
         writeObject(HEAD, head0);
+        File blobs = join(commits, "blobs");
+        blobs.mkdir();
+        File stageforadd = join(GITLET_DIR, "stageforaddition");
+        File stagefordel = join(GITLET_DIR, "stagefordeletion");
+        stagefordel.mkdir();
+        stageforadd.mkdir();
     }
 
 
