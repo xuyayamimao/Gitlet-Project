@@ -1,6 +1,8 @@
 package gitlet;
 
 import java.io.File;
+import java.io.Serializable;
+
 import static gitlet.Utils.*;
 
 // TODO: any imports you need here
@@ -24,6 +26,22 @@ public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
+
+    public static void setupInit(){
+        if (GITLET_DIR.exists()){
+            Main.exitWithError("A Gitlet version-control system already exists in the" +
+                    " current directory");
+        }
+        GITLET_DIR.mkdir();
+        Commit initial = new Commit();
+        byte[] commit0 = serialize(initial);
+        String uid = sha1(commit0);
+        String filename = uid + ".txt";
+        File initialcommit = join(CWD, ".gitlet/", filename);
+        writeObject(initialcommit, initial);
+    }
+
+
 
     /* TODO: fill in the rest of this class. */
 }
