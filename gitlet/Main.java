@@ -1,5 +1,7 @@
 package gitlet;
 
+import java.io.File;
+
 /** Driver class for Gitlet, a subset of the Git version-control system.
  *  @author TODO
  */
@@ -20,10 +22,12 @@ public class Main {
                 break;
             case "add":
                 validateNumArgs("add", args, 2);
+                gitletExist();
+                // TODO: handle the `add [filename]` command
                 break;
             // TODO: FILL THE REST IN
         }
-        exitWithError("No command with that name exists.")
+        exitWithError("No command with that name exists.");
     }
 
     public static void exitWithError(String message) {
@@ -44,6 +48,17 @@ public class Main {
     public static void validateNumArgs(String cmd, String[] args, int n) {
         if (args.length != n) {
             exitWithError("Incorrect operands.");
+        }
+    }
+
+    /**
+     * Checks if there exists an initialized Gitlet working
+     * directory, throws a RuntimeException if there isn't
+     * Gitlet working directory.
+     */
+    public static void gitletExist(){
+        if (!Repository.GITLET_DIR.exists()){
+            exitWithError("Not in an initialized Gitlet directory.");
         }
     }
 }
