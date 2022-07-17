@@ -19,7 +19,7 @@ public class Main {
                 Repository.setupInit();
                 break;
             case "add":
-                validateNumArgs("add", args, 1);
+                validateNumArgs("add", args, 2);
                 break;
             // TODO: FILL THE REST IN
         }

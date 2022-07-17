@@ -48,6 +48,20 @@ public class Repository {
         writeObject(HEAD, head0);
     }
 
+    public static void setupAdd(String[] args) {
+        File a = new File (args[1]);
+        if (!a.exists()) {
+            Main.exitWithError("File does not exist.");
+        }
+        File stagingArea = join(GITLET_DIR, "staging area");
+        if(!stagingArea.exists()){
+            stagingArea.mkdirs();
+        }
+        File acopy = join(stagingArea, args[1]);
+        writeContents(acopy, readContents(a));
+    }
+
+
 
 
 
