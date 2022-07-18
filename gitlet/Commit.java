@@ -29,16 +29,23 @@ public class Commit implements Serializable {
     private Date timestamp;
 
     /**      */
-    private Commit parent;
+    private String parent;
 
 
-    private ArrayList<File> fileArrayList;
+    private BinarySearchTree<Blob> BlobTree;
 
     public Commit(){
         message = "initial commit";
         timestamp = new Date(0);
         parent = null;
-        fileArrayList = null;
+        BlobTree = null;
+    }
+
+    public Commit(String message, Date timestamp, String parent, BinarySearchTree<Blob> BlobTree){
+        this.message = message;
+        this.timestamp = timestamp;
+        this.parent = parent;
+        this.BlobTree = BlobTree;
     }
 
 

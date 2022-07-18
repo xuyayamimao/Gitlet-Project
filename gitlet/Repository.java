@@ -48,18 +48,18 @@ public class Repository {
         writeObject(HEAD, head0);
         File blobs = join(commits, "blobs");
         blobs.mkdir();
-        File stageforadd = join(GITLET_DIR, "stageforaddition");
+        /*File stageforadd = join(GITLET_DIR, "stageforaddition");
         File stagefordel = join(GITLET_DIR, "stagefordeletion");
         stagefordel.mkdir();
-        stageforadd.mkdir();
+        stageforadd.mkdir();*/
     }
 
     public static void setupAdd(String[] args) {
-        File a = new File (args[1]);
+        File a = join(CWD, args[1]);
         if (!a.exists()) {
             Main.exitWithError("File does not exist.");
         }
-        File stagingArea = join(GITLET_DIR, "staging area");
+        File stagingArea = join(GITLET_DIR, "stageforaddition");
         if(!stagingArea.exists()){
             stagingArea.mkdirs();
         }
