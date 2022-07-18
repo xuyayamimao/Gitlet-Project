@@ -2,6 +2,8 @@ package gitlet;
 
 // TODO: any imports you need here
 
+import edu.princeton.cs.algs4.BinarySearch;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,20 +34,59 @@ public class Commit implements Serializable {
     private String parent;
 
 
-    private BinarySearchTree<Blob> BlobTree;
+    private ArrayList<Blob> blobList;
 
     public Commit(){
         message = "initial commit";
         timestamp = new Date(0);
         parent = null;
-        BlobTree = null;
+        blobList = null;
     }
 
-    public Commit(String message, Date timestamp, String parent, BinarySearchTree<Blob> BlobTree){
+    public Commit(String message, Date timestamp, String parent, ArrayList<Blob> blobList){
         this.message = message;
         this.timestamp = timestamp;
         this.parent = parent;
-        this.BlobTree = BlobTree;
+        this.blobList = blobList;
+    }
+
+    public Date getTimestamp(){
+        return timestamp;
+    }
+
+    public String getParent(){
+        return parent;
+    }
+
+    public ArrayList<Blob> getBlobList(){
+        return blobList;
+    }
+
+    /*
+     * public static int indexOf(int[] a, int key) {
+     *         int lo = 0;
+     *         int hi = a.length - 1;
+     *         while (lo <= hi) {
+     *             // Key is in a[lo..hi] or not present.
+     *             int mid = lo + (hi - lo) / 2;
+     *             if      (key < a[mid]) hi = mid - 1;
+     *             else if (key > a[mid]) lo = mid + 1;
+     *             else return mid;
+     *         }
+     *         return -1;
+     *     }
+     */
+
+    public void addBlob(Blob blob){
+        int lo = 0;
+        int hi = blobList.toArray().length - 1;
+        while (lo <= hi) {
+            // Key is in a[lo..hi] or not present.
+            int mid = lo + (hi - lo) / 2;
+            if      (blob < a[mid]) hi = mid - 1;
+            else if (key > a[mid]) lo = mid + 1;
+            else return mid;
+        }
     }
 
 

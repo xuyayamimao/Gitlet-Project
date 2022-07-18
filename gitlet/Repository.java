@@ -1,5 +1,7 @@
 package gitlet;
 
+import edu.princeton.cs.algs4.BinarySearch;
+
 import java.io.File;
 import java.io.Serializable;
 
@@ -48,23 +50,38 @@ public class Repository {
         writeObject(HEAD, head0);
         File blobs = join(commits, "blobs");
         blobs.mkdir();
-        /*File stageforadd = join(GITLET_DIR, "stageforaddition");
-        File stagefordel = join(GITLET_DIR, "stagefordeletion");
+        File stageforadd = join(GITLET_DIR, "stageforAddition");
+        File stagefordel = join(GITLET_DIR, "stageforDeletion");
         stagefordel.mkdir();
-        stageforadd.mkdir();*/
+        stageforadd.mkdir();
     }
 
     public static void setupAdd(String[] args) {
-        File a = join(CWD, args[1]);
-        if (!a.exists()) {
+        File file = join(CWD, args[1]);
+        if (!file.exists()) {
             Main.exitWithError("File does not exist.");
         }
-        File stagingArea = join(GITLET_DIR, "stageforaddition");
-        if(!stagingArea.exists()){
-            stagingArea.mkdirs();
+        File stagingArea = join(GITLET_DIR, "stageforAddition");
+        File filecopy = join(stagingArea, args[1]);
+        if (!filecopy.exists()) {
+            Commit b = getNewestCommit();
+            Blob[] bloblist = (Blob[]) b.getBlobList().toArray();
+            BinarySearch.indexOf()
+            writeContents(filecopy, readContents(file));
         }
-        File acopy = join(stagingArea, args[1]);
-        writeContents(acopy, readContents(a));
+    }
+
+    public static Commit getNewestCommit(){
+        File head = join(GITLET_DIR, "Commits", "HEAD.txt");
+        Head a = readObject(head, Head.class);
+        String commitPath = a.getCommitID() + ".txt";
+        File newestCommit = join(GITLET_DIR, "commits", commitPath);
+        Commit b = readObject(newestCommit, Commit.class);
+        return b;
+    }
+
+    public static void setupCommit(String[] args) {
+
     }
 
 
