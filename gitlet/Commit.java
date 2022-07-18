@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date; // TODO: You'll likely use this in this class
 
+import static gitlet.Utils.join;
+
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
@@ -62,34 +64,23 @@ public class Commit implements Serializable {
         return blobList;
     }
 
-    /*
-     * public static int indexOf(int[] a, int key) {
-     *         int lo = 0;
-     *         int hi = a.length - 1;
-     *         while (lo <= hi) {
-     *             // Key is in a[lo..hi] or not present.
-     *             int mid = lo + (hi - lo) / 2;
-     *             if      (key < a[mid]) hi = mid - 1;
-     *             else if (key > a[mid]) lo = mid + 1;
-     *             else return mid;
-     *         }
-     *         return -1;
-     *     }
-     */
+
 
     public void addBlob(Blob blob){
-        int lo = 0;
-        int hi = blobList.toArray().length - 1;
-        while (lo <= hi) {
-            // Key is in a[lo..hi] or not present.
-            int mid = lo + (hi - lo) / 2;
-            if      (blob < a[mid]) hi = mid - 1;
-            else if (key > a[mid]) lo = mid + 1;
-            else return mid;
+        if (blobList == null) {
+            blobList = new ArrayList<Blob>();
         }
+        int lo = 0;
+        int hi = blobList.size() - 1;
+        while (lo <= hi) {
+            int mid = lo + (hi - lo) / 2;
+            if (blob.compareTo(blobList.get(mid)) < 0) {
+                hi = mid - 1;
+            } else if (blob.compareTo(blobList.get(mid)) > 0) {
+                lo = mid + 1;
+            }
+        } blobList.add(lo, blob);
     }
-
-
 
     /* TODO: fill in the rest of this class. */
 }
