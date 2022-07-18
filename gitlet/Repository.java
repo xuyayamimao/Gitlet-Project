@@ -7,6 +7,8 @@ import java.io.Serializable;
 
 import static gitlet.Utils.*;
 
+import java.util.Date;
+
 // TODO: any imports you need here
 
 /** Represents a gitlet repository.
@@ -24,13 +26,17 @@ public class Repository {
      * variable is used. We've provided two examples for you.
      */
 
-    /** The current working directory. */
+    /**
+     * The current working directory.
+     */
     public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet directory. */
+    /**
+     * The .gitlet directory.
+     */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
-    public static void setupInit(){
-        if (GITLET_DIR.exists()){
+    public static void setupInit() {
+        if (GITLET_DIR.exists()) {
             Main.exitWithError("A Gitlet version-control system already exists in the" +
                     " current directory.");
         }
@@ -149,7 +155,7 @@ public class Repository {
         return -1;
     }
 
-    public static Commit getNewestCommit(){
+    public static Commit getNewestCommit() {
         File head = join(GITLET_DIR, "Commits", "HEAD.txt");
         Head a = readObject(head, Head.class);
         String commitPath = a.getCommitID() + ".txt";
@@ -157,9 +163,16 @@ public class Repository {
         return readObject(newestCommit, Commit.class);
     }
 
-    public static void setupCommit(String[] args) {
 
+    public void setupCommit(String[] args) {
+        File stageforadd = join(GITLET_DIR, "stageforAddition");
+        File stagefordel = join(GITLET_DIR, "stageforDeletion");
+        if (stageforadd.list().length == 0) {
+            Commit a = new Commit(args[1], new Date(),
+                    getNewestCommit().
+                    getNewestCommit().getBlobList());
     }
+}
 
 
 
