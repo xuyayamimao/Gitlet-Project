@@ -36,6 +36,16 @@ public class Main {
                 validateNumArgs("log", args, 1);
                 Repository.setupLog();
                 break;
+            case "checkout":
+                gitletExist();
+                if (args.length == 2) {
+
+                } else if (args.length == 3) {
+
+                } else {
+                    exitWithError("Incorrect operands");
+                }
+                break;
             default:
                 exitWithError("No command with that name exists.");
         }
