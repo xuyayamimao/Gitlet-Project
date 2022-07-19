@@ -71,7 +71,7 @@ public class Repository {
         }
         File filecopy = join(STAGEFOR_ADDITION, args[1]);
         Commit newestCommit = getNewestCommit();
-        Blob[] bloblist = (Blob[]) newestCommit.getBlobList().toArray();
+        List<Blob> bloblist = newestCommit.getBlobList();
         int index = indexOf(bloblist, args[1]);
         if (index == -1) {
             if (!filecopy.exists()) {
@@ -84,7 +84,7 @@ public class Repository {
                 }
             }
         } else {
-            Blob recentVersion = bloblist[index];
+            Blob recentVersion = bloblist.get(index);
             if (!filecopy.exists()) {
                 if (Utils.sha1(readContents(file)).equals(recentVersion.getBlobID())) {
                     return;
@@ -132,7 +132,7 @@ public class Repository {
     /**
      * Returns the index of the specified file in the Blob array.
      *
-     * @param b        the array of Blobs, must be sorted in ascending order
+     * @param b       the arrayList of Blobs, must be sorted in ascending order
      * @param filename the search filename
      * @return index of key in array {@code a} if present; {@code -1} otherwise
      * <p>
@@ -151,17 +151,18 @@ public class Repository {
      * return -1;
      * }
      */
-    public static int indexOf(Blob[] b, String filename) {
-        if (b == null) {
+    public static int indexOf(List<Blob> b, String filename) {
+        Blob[] blobs = (Blob[]) b.toArray();
+        if (blobs == null) {
             return -1;
         }
         int lo = 0;
-        int hi = b.length - 1;
+        int hi = blobs.length - 1;
         while (lo <= hi) {
             int mid = lo + (hi - lo) / 2;
-            if (filename.compareTo(b[mid].getFilename()) < 0) {
+            if (filename.compareTo(blobs[mid].getFilename()) < 0) {
                 hi = mid - 1;
-            } else if (filename.compareTo(b[mid].getFilename()) > 0) {
+            } else if (filename.compareTo(blobs[mid].getFilename()) > 0) {
                 lo = mid + 1;
             } else {
                 return mid;
@@ -182,31 +183,37 @@ public class Repository {
         return a.getCommitID();
     }
 
+    public static String getBranch(){
+        return readObject(HEAD, Head.class).getBranch();
+    }
+
 
     public void setupCommit(String[] args) {
-        File main = join(COMMITS, "Main.txt");
-        if (STAGEFOR_ADDITION.list().length == 0) {
-            System.out.println("No changes added to the commit.");
-        } else if (STAGEFOR_ADDITION.list().length != 0) {
+        File branch = join(COMMITS, getBranch() + ".txt");
+        List<String> staged = plainFilenamesIn(STAGEFOR_ADDITION);
+        if (staged.size() == 0) {
+            Main.exitWithError("No changes added to the commit.");
+        }
+        else {
             ArrayList<Blob> defaultblob = getNewestCommit().getBlobList();
             Commit current = new Commit(args[1], new Date(),
                     getNewestCommitID(), defaultblob);
-            List<String> staged = plainFilenamesIn(STAGEFOR_ADDITION);
             for (String a : staged) {
-                File b = new File(a);
-                Blob c = new Blob(a, sha1(readContents(b)));
-                for (Blob d : defaultblob) {
-                    if (c.compareTo(d) != 0) {
-                        current.addBlob(c);
-                    } else if (c.compareTo(d) == 0) {
-                        d.setBlobID(sha1(readContents(b)));
-                    }
-                    File newblob = join(BLOBS, c.getBlobID() + ".txt");
-                    writeObject(newblob, c);
-                }
-                restrictedDelete(a);
+                File b = join(STAGEFOR_ADDITION, a);
+                byte[] content = readContents(b);
+                String id = sha1(content);
+                Blob c = new Blob(a, id);
+                File version = join(BLOBS, id + ".txt");
+                writeContents(version, content);
+                current.addBlob(c);
+                b.delete();
             }
-            writeObject(HEAD, new Head(sha1(serialize(current)), "Main"));
+            String uid = sha1(serialize(current));
+            String commmitFilename = uid + ".txt";
+            File commit = join(COMMITS, commmitFilename);
+            writeObject(commit, current);
+            writeContents(branch, uid);
+            writeObject(HEAD, new Head(uid, getBranch()));
         }
     }
 

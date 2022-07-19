@@ -85,8 +85,12 @@ public class Commit implements Serializable {
                 hi = mid - 1;
             } else if (blob.compareTo(blobList.get(mid)) > 0) {
                 lo = mid + 1;
+            } else {
+                blobList.set(mid, blob);
+                return;
             }
-        } blobList.add(lo, blob);
+        }
+        blobList.add(lo, blob);
     }
 
     /* TODO: fill in the rest of this class. */
