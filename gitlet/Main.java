@@ -27,12 +27,17 @@ public class Main {
                 Repository.setupAdd(args);
                 break;
             case "commit":
+                gitletExist();
                 validateNumArgs("commit", args, 2);
+                Repository.setupCommit(args);
+                break;
             case "log":
                 gitletExist();
                 validateNumArgs("log", args, 1);
                 Repository.setupLog();
                 break;
+            default:
+                exitWithError("No command with that name exists.");
         }
     }
 
@@ -52,10 +57,11 @@ public class Main {
      * @param n Number of expected arguments
      */
     public static void validateNumArgs(String cmd, String[] args, int n) {
-        if (cmd == "commit" && args.length != n) {
-            exitWithError("Please enter a commit message.");
-        } else if (args.length != n) {
+        if (args.length != n) {
             exitWithError("Incorrect operands");
+        }
+        if (cmd.equals("commit") && args[1].equals("")) {
+            exitWithError("Please enter a commit message.");
         }
     }
 

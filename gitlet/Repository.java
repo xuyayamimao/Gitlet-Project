@@ -188,7 +188,7 @@ public class Repository {
     }
 
 
-    public void setupCommit(String[] args) {
+    public static void setupCommit(String[] args) {
         File branch = join(COMMITS, getBranch() + ".txt");
         List<String> staged = plainFilenamesIn(STAGEFOR_ADDITION);
         if (staged.size() == 0) {
