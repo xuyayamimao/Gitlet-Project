@@ -214,7 +214,20 @@ public class Repository {
             writeContents(branch, uid);
             writeObject(HEAD, new Head(uid, getBranch()));
         }
-    }
+
+        }
+
+    public static void setupCheckout1(String[] args) {
+        String filename = args[1];
+        ArrayList<Blob> a = getNewestCommit().getBlobList();
+        if (indexOf(a, filename) == -1) {
+            Main.exitWithError("File does not exist in that commit.");
+        }
+            File newFile = join(BLOBS, filename);
+            File oldFile = join(CWD, filename);
+            writeContents(oldFile, readContents(newFile));
+        }
+
 
 
 
