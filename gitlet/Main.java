@@ -14,6 +14,7 @@ public class Main {
         if (args.length == 0){
             exitWithError("Please enter a command.");
         }
+
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
@@ -25,7 +26,13 @@ public class Main {
                 validateNumArgs("add", args, 2);
                 Repository.setupAdd(args);
                 break;
-            // TODO: FILL THE REST IN
+            case "commit":
+                validateNumArgs("commit", args, 2);
+            case "log":
+                gitletExist();
+                validateNumArgs("log", args, 1);
+                Repository.setupLog();
+                break;
         }
     }
 
@@ -45,8 +52,10 @@ public class Main {
      * @param n Number of expected arguments
      */
     public static void validateNumArgs(String cmd, String[] args, int n) {
-        if (args.length != n) {
-            exitWithError("Incorrect operands.");
+        if (cmd == "commit" && args.length != n) {
+            exitWithError("Please enter a commit message.");
+        } else if (args.length != n) {
+            exitWithError("Incorrect operands");
         }
     }
 
