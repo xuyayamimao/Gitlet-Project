@@ -1,12 +1,11 @@
 package gitlet;
 
-import edu.princeton.cs.algs4.BinarySearch;
-
 import java.io.File;
 import java.io.Serializable;
 
 import static gitlet.Utils.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 // TODO: any imports you need here
@@ -108,9 +107,42 @@ public class Repository {
                     }
                 }
             }
-
         }
     }
+
+    public static void setupCommit(String[] args) {
+        File stageforadd = join(GITLET_DIR, "stageforAddition");
+        File stagefordel = join(GITLET_DIR, "stageforDeletion");
+        if (stageforadd.list().length == 0) {
+            //Commit a = new Commit(args[1], new Date(),
+            //getNewestCommit().;
+            //getNewestCommit().getBlobList());
+        }
+        return;
+    }
+
+    public static void setupLog(){
+        logHelper(getNewestCommit(), getNewestCommitID());
+    }
+
+    private static void logHelper(Commit a, String id){
+        System.out.println("===");
+        System.out.println("commit " + id);
+        SimpleDateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
+        System.out.println("Date: " + format.format(a.getTimestamp()));
+        System.out.println(a.getMessage());
+        System.out.println();
+        String parent = a.getParent();
+        if (parent == null){
+            return;
+        }
+        File next = join(GITLET_DIR, "commits", parent + ".txt");
+        if (!next.exists()){
+            error("parent doesn't exist.");
+        }
+        logHelper(readObject(next, Commit.class), parent);
+    }
+
 
     /**
      * Returns the index of the specified file in the Blob array.
@@ -156,27 +188,18 @@ public class Repository {
     }
 
     public static Commit getNewestCommit() {
-        File head = join(GITLET_DIR, "Commits", "HEAD.txt");
+        File head = join(GITLET_DIR, "commits", "HEAD.txt");
         Head a = readObject(head, Head.class);
         String commitPath = a.getCommitID() + ".txt";
         File newestCommit = join(GITLET_DIR, "commits", commitPath);
         return readObject(newestCommit, Commit.class);
     }
 
-
-    public void setupCommit(String[] args) {
-        File stageforadd = join(GITLET_DIR, "stageforAddition");
-        File stagefordel = join(GITLET_DIR, "stageforDeletion");
-        if (stageforadd.list().length == 0) {
-            Commit a = new Commit(args[1], new Date(),
-                    getNewestCommit().
-                    getNewestCommit().getBlobList());
+    public static String getNewestCommitID() {
+        File head = join(GITLET_DIR, "commits", "HEAD.txt");
+        Head a = readObject(head, Head.class);
+        return a.getCommitID();
     }
-}
-
-
-
-
 
 
 

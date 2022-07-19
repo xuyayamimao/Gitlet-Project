@@ -2,12 +2,11 @@ package gitlet;
 
 // TODO: any imports you need here
 
-import edu.princeton.cs.algs4.BinarySearch;
-
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date; // TODO: You'll likely use this in this class
+import java.util.Hashtable;
 
 import static gitlet.Utils.join;
 
@@ -35,6 +34,10 @@ public class Commit implements Serializable {
     /**      */
     private String parent;
 
+    /**
+     *
+     */
+    private Hashtable<String, String> filetable;
 
     private ArrayList<Blob> blobList;
 
@@ -50,6 +53,10 @@ public class Commit implements Serializable {
         this.timestamp = timestamp;
         this.parent = parent;
         this.blobList = blobList;
+    }
+
+    public String getMessage(){
+        return message;
     }
 
     public Date getTimestamp(){

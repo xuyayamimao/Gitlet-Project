@@ -14,6 +14,7 @@ public class Main {
         if (args.length == 0){
             exitWithError("Please enter a command.");
         }
+
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
@@ -25,7 +26,11 @@ public class Main {
                 validateNumArgs("add", args, 2);
                 Repository.setupAdd(args);
                 break;
-            // TODO: FILL THE REST IN
+            case "log":
+                gitletExist();
+                validateNumArgs("log", args, 1);
+                Repository.setupLog();
+                break;
         }
     }
 
