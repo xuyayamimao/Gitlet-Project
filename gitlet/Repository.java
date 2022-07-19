@@ -132,7 +132,7 @@ public class Repository {
     /**
      * Returns the index of the specified file in the Blob array.
      *
-     * @param b       the arrayList of Blobs, must be sorted in ascending order
+     * @param blobs       the arrayList of Blobs, must be sorted in ascending order
      * @param filename the search filename
      * @return index of key in array {@code a} if present; {@code -1} otherwise
      * <p>
@@ -151,18 +151,17 @@ public class Repository {
      * return -1;
      * }
      */
-    public static int indexOf(List<Blob> b, String filename) {
-        Blob[] blobs = (Blob[]) b.toArray();
-        if (blobs == null) {
+    public static int indexOf(List<Blob> blobs, String filename) {
+        if (blobs == null){
             return -1;
         }
         int lo = 0;
-        int hi = blobs.length - 1;
+        int hi = blobs.size() - 1;
         while (lo <= hi) {
             int mid = lo + (hi - lo) / 2;
-            if (filename.compareTo(blobs[mid].getFilename()) < 0) {
+            if (filename.compareTo(blobs.get(mid).getFilename()) < 0) {
                 hi = mid - 1;
-            } else if (filename.compareTo(blobs[mid].getFilename()) > 0) {
+            } else if (filename.compareTo(blobs.get(mid).getFilename()) > 0) {
                 lo = mid + 1;
             } else {
                 return mid;

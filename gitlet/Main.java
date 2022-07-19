@@ -58,7 +58,7 @@ public class Main {
      */
     public static void validateNumArgs(String cmd, String[] args, int n) {
         if (args.length != n) {
-            exitWithError("Incorrect operands");
+            exitWithError("Incorrect operands.");
         }
         if (cmd.equals("commit") && args[1].equals("")) {
             exitWithError("Please enter a commit message.");
