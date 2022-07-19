@@ -220,13 +220,30 @@ public class Repository {
     public static void setupCheckout1(String[] args) {
         String filename = args[1];
         ArrayList<Blob> a = getNewestCommit().getBlobList();
-        if (indexOf(a, filename) == -1) {
+        int filepos = indexOf(a, filename);
+        if (filepos == -1) {
             Main.exitWithError("File does not exist in that commit.");
         }
-            File newFile = join(BLOBS, filename);
-            File oldFile = join(CWD, filename);
-            writeContents(oldFile, readContents(newFile));
+        File newFile = join(BLOBS, a.get(filepos).getBlobID() + ".txt");
+        File oldFile = join(CWD, filename);
+        writeContents(oldFile, readContents(newFile));
+    }
+
+    public static void setupCheckout2(String[] args) {
+        File commitfile = join(COMMITS, args[1] + ".txt");
+        if (!commitfile.exists()) {
+            Main.exitWithError("No commit with that id exists.");
         }
+        Commit a = readObject(commitfile, Commit.class);
+        ArrayList<Blob> b = a.getBlobList();
+        int filepos = indexOf(b, args[2]);
+        if (filepos == -1) {
+            Main.exitWithError("File does not exist in that commit.");
+        }
+        File newFile = join(BLOBS, b.get(filepos).getBlobID() + ".txt");
+        File oldFile = join(CWD, args[2]);
+        writeContents(oldFile, readContents(newFile));
+    }
 
 
 
