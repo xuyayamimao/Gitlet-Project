@@ -2,19 +2,17 @@ package gitlet;
 
 // TODO: any imports you need here
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.util.Date;
 import java.util.Hashtable;
 
-import static gitlet.Utils.join;
-
-/** Represents a gitlet commit object.
+/**
+ * Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ * @author TODO
  */
 public class Commit implements Serializable {
     /**
@@ -25,13 +23,19 @@ public class Commit implements Serializable {
      * variable is used. We've provided one example for `message`.
      */
 
-    /** The message of this Commit. */
+    /**
+     * The message of this Commit.
+     */
     private String message;
 
-    /**      */
+    /**
+     *
+     */
     private Date timestamp;
 
-    /**      */
+    /**
+     *
+     */
     private String parent;
 
     /**
@@ -41,39 +45,38 @@ public class Commit implements Serializable {
 
     private ArrayList<Blob> blobList;
 
-    public Commit(){
+    public Commit() {
         message = "initial commit";
         timestamp = new Date(0);
         parent = null;
         blobList = null;
     }
 
-    public Commit(String message, Date timestamp, String parent, ArrayList<Blob> blobList){
+    public Commit(String message, Date timestamp, String parent, ArrayList<Blob> blobList) {
         this.message = message;
         this.timestamp = timestamp;
         this.parent = parent;
         this.blobList = blobList;
     }
 
-    public String getMessage(){
+    public String getMessage() {
         return message;
     }
 
-    public Date getTimestamp(){
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public String getParent(){
+    public String getParent() {
         return parent;
     }
 
-    public ArrayList<Blob> getBlobList(){
+    public ArrayList<Blob> getBlobList() {
         return blobList;
     }
 
 
-
-    public void addBlob(Blob blob){
+    public void addBlob(Blob blob) {
         if (blobList == null) {
             blobList = new ArrayList<Blob>();
         }

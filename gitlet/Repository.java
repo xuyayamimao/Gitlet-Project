@@ -1,14 +1,12 @@
 package gitlet;
 
 import java.io.File;
-
-import static gitlet.Utils.*;
-
-
-import java.util.ArrayList;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static gitlet.Utils.*;
 
 
 /**
@@ -132,7 +130,7 @@ public class Repository {
     /**
      * Returns the index of the specified file in the Blob array.
      *
-     * @param blobs       the arrayList of Blobs, must be sorted in ascending order
+     * @param blobs    the arrayList of Blobs, must be sorted in ascending order
      * @param filename the search filename
      * @return index of key in array {@code a} if present; {@code -1} otherwise
      * <p>
@@ -152,7 +150,7 @@ public class Repository {
      * }
      */
     public static int indexOf(List<Blob> blobs, String filename) {
-        if (blobs == null){
+        if (blobs == null) {
             return -1;
         }
         int lo = 0;
@@ -182,7 +180,7 @@ public class Repository {
         return a.getCommitID();
     }
 
-    public static String getBranch(){
+    public static String getBranch() {
         return readObject(HEAD, Head.class).getBranch();
     }
 
@@ -192,8 +190,7 @@ public class Repository {
         List<String> staged = plainFilenamesIn(STAGEFOR_ADDITION);
         if (staged.size() == 0) {
             Main.exitWithError("No changes added to the commit.");
-        }
-        else {
+        } else {
             ArrayList<Blob> defaultblob = getNewestCommit().getBlobList();
             Commit current = new Commit(args[1], new Date(),
                     getNewestCommitID(), defaultblob);
@@ -215,10 +212,10 @@ public class Repository {
             writeObject(HEAD, new Head(uid, getBranch()));
         }
 
-        }
+    }
 
     public static void setupCheckout1(String[] args) {
-        String filename = args[1];
+        String filename = args[2];
         ArrayList<Blob> a = getNewestCommit().getBlobList();
         int filepos = indexOf(a, filename);
         if (filepos == -1) {
@@ -236,22 +233,14 @@ public class Repository {
         }
         Commit a = readObject(commitfile, Commit.class);
         ArrayList<Blob> b = a.getBlobList();
-        int filepos = indexOf(b, args[2]);
+        int filepos = indexOf(b, args[3]);
         if (filepos == -1) {
             Main.exitWithError("File does not exist in that commit.");
         }
         File newFile = join(BLOBS, b.get(filepos).getBlobID() + ".txt");
-        File oldFile = join(CWD, args[2]);
+        File oldFile = join(CWD, args[3]);
         writeContents(oldFile, readContents(newFile));
     }
-
-
-
-
-
-
-
-
 
     /* TODO: fill in the rest of this class. */
 }

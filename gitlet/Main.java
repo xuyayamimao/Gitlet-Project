@@ -1,53 +1,53 @@
 package gitlet;
 
-import java.io.File;
-
-/** Driver class for Gitlet, a subset of the Git version-control system.
- *  @author TODO
+/**
+ * Driver class for Gitlet, a subset of the Git version-control system.
+ *
+ * @author TODO
  */
 public class Main {
 
-    /** Usage: java gitlet.Main ARGS, where ARGS contains
-     *  <COMMAND> <OPERAND1> <OPERAND2> ... 
+    /**
+     * Usage: java gitlet.Main ARGS, where ARGS contains
+     * <COMMAND> <OPERAND1> <OPERAND2> ...
      */
     public static void main(String[] args) {
-        if (args.length == 0){
+        if (args.length == 0) {
             exitWithError("Please enter a command.");
         }
 
         String firstArg = args[0];
-        switch(firstArg) {
-            case "init":
+        switch (firstArg) {
+            case "init" -> {
                 validateNumArgs("init", args, 1);
                 Repository.setupInit();
-                break;
-            case "add":
+            }
+            case "add" -> {
                 gitletExist();
                 validateNumArgs("add", args, 2);
                 Repository.setupAdd(args);
-                break;
-            case "commit":
+            }
+            case "commit" -> {
                 gitletExist();
                 validateNumArgs("commit", args, 2);
                 Repository.setupCommit(args);
-                break;
-            case "log":
+            }
+            case "log" -> {
                 gitletExist();
                 validateNumArgs("log", args, 1);
                 Repository.setupLog();
-                break;
-            case "checkout":
+            }
+            case "checkout" -> {
                 gitletExist();
-                if (args.length == 2) {
-
-                } else if (args.length == 3) {
-
+                if (args.length == 3) {
+                    Repository.setupCheckout1(args);
+                } else if (args.length == 4) {
+                    Repository.setupCheckout2(args);
                 } else {
-                    exitWithError("Incorrect operands");
+                    exitWithError("Incorrect operands.");
                 }
-                break;
-            default:
-                exitWithError("No command with that name exists.");
+            }
+            default -> exitWithError("No command with that name exists.");
         }
     }
 
@@ -62,9 +62,9 @@ public class Main {
      * Checks the number of arguments versus the expected number,
      * throws a RuntimeException if they do not match.
      *
-     * @param cmd Name of command you are validating
+     * @param cmd  Name of command you are validating
      * @param args Argument array from command line
-     * @param n Number of expected arguments
+     * @param n    Number of expected arguments
      */
     public static void validateNumArgs(String cmd, String[] args, int n) {
         if (args.length != n) {
@@ -80,8 +80,8 @@ public class Main {
      * directory, throws a RuntimeException if there isn't
      * Gitlet working directory.
      */
-    public static void gitletExist(){
-        if (!Repository.GITLET_DIR.exists()){
+    public static void gitletExist() {
+        if (!Repository.GITLET_DIR.exists()) {
             exitWithError("Not in an initialized Gitlet directory.");
         }
     }
