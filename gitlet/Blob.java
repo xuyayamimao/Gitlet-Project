@@ -20,6 +20,8 @@ public class Blob implements Serializable, Comparable <Blob>{
         return blobID;
     }
 
+    public void setBlobID(String a) {this.blobID = a; }
+
     @Override
     public int compareTo(Blob o) {
         return filename.compareTo(o.filename);

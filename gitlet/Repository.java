@@ -188,15 +188,22 @@ public class Repository {
         if (STAGEFOR_ADDITION.list().length == 0) {
             System.out.println("No changes added to the commit.");
         } else if (STAGEFOR_ADDITION.list().length != 0) {
+            ArrayList<Blob> defaultblob = getNewestCommit().getBlobList();
             Commit current = new Commit(args[1], new Date(),
-                    getNewestCommitID(), new ArrayList<>());
+                    getNewestCommitID(), defaultblob);
             List<String> staged = plainFilenamesIn(STAGEFOR_ADDITION);
             for (String a : staged) {
                 File b = new File(a);
                 Blob c = new Blob(a, sha1(readContents(b)));
-                current.addBlob(c);
-                File newblob = join(BLOBS, c.getBlobID() + ".txt");
-                writeObject(newblob, c);
+                for (Blob d : defaultblob) {
+                    if (c.compareTo(d) != 0) {
+                        current.addBlob(c);
+                    } else if (c.compareTo(d) == 0) {
+                        d.setBlobID(sha1(readContents(b)));
+                    }
+                    File newblob = join(BLOBS, c.getBlobID() + ".txt");
+                    writeObject(newblob, c);
+                }
                 restrictedDelete(a);
             }
             writeObject(HEAD, new Head(sha1(serialize(current)), "Main"));
