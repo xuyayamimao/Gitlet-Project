@@ -7,7 +7,9 @@ import java.io.Serializable;
 
 import static gitlet.Utils.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 // TODO: any imports you need here
 
@@ -163,15 +165,38 @@ public class Repository {
         return readObject(newestCommit, Commit.class);
     }
 
+    public static String getNewestCommitID() {
+        File head = join(GITLET_DIR, "Commits", "HEAD.txt");
+        Head a = readObject(head, Head.class);
+        String commitID = a.getCommitID() + ".txt";
+        return commitID;
+    }
+
 
     public void setupCommit(String[] args) {
         File stageforadd = join(GITLET_DIR, "stageforAddition");
         File stagefordel = join(GITLET_DIR, "stageforDeletion");
+        File commits = join(GITLET_DIR, "commits");
+        File blobs = join(commits, "blobs");
+        File Main = join(commits, "Main.txt");
+        File head = join(GITLET_DIR, "Commits", "HEAD.txt");
         if (stageforadd.list().length == 0) {
             Commit a = new Commit(args[1], new Date(),
-                    getNewestCommit().
-                    getNewestCommit().getBlobList());
-    }
+                    getNewestCommitID(), getNewestCommit().getBlobList());
+        }else if (stageforadd.list().length != 0) {
+            Commit current = new Commit(args[1], new Date(),
+                    getNewestCommitID(), new ArrayList<>());
+            List<String> staged = plainFilenamesIn(stageforadd);
+            for (String a : staged) {
+                File b = new File(a);
+                Blob c = new Blob(a, sha1(readContents(b)));
+                current.addBlob(c);
+                File newblob = join(blobs, c.getBlobID() + ".txt");
+                writeObject(newblob, c);
+                restrictedDelete(a);
+            }
+            writeObject(head, new Head(sha1(serialize(current)), "Main"));
+        }
 }
 
 
