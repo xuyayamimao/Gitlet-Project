@@ -38,7 +38,7 @@ public class Repository {
     public static final File STAGEFOR_DELETION = join(GITLET_DIR, "stageforDeletion");
     public static final File COMMITS = join(GITLET_DIR, "commits");
     public static final File BLOBS = join(COMMITS, "blobs");
-    public static final File HEAD = join(GITLET_DIR, "Commits", "HEAD.txt");
+    public static final File HEAD = join(GITLET_DIR, "commits", "HEAD.txt");
 
     public static void setupInit() {
         if (GITLET_DIR.exists()) {
