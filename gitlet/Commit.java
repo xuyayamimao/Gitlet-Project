@@ -2,9 +2,11 @@ package gitlet;
 
 // TODO: any imports you need here
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 /**
@@ -41,22 +43,20 @@ public class Commit implements Serializable {
     /**
      *
      */
-    private Hashtable<String, String> filetable;
-
-    private ArrayList<Blob> blobList;
+    private HashMap<String, String> fileHashMap;
 
     public Commit() {
         message = "initial commit";
         timestamp = new Date(0);
         parent = null;
-        blobList = null;
+        fileHashMap = new HashMap<>();
     }
 
-    public Commit(String message, Date timestamp, String parent, ArrayList<Blob> blobList) {
+    public Commit(String message, Date timestamp, String parent, HashMap<String, String> fileHashMap) {
         this.message = message;
         this.timestamp = timestamp;
         this.parent = parent;
-        this.blobList = blobList;
+        this.fileHashMap = fileHashMap;
     }
 
     public String getMessage() {
@@ -71,11 +71,11 @@ public class Commit implements Serializable {
         return parent;
     }
 
-    public ArrayList<Blob> getBlobList() {
-        return blobList;
+    public HashMap<String, String> getFileHashMap() {
+        return fileHashMap;
     }
 
-
+/*
     public void addBlob(Blob blob) {
         if (blobList == null) {
             blobList = new ArrayList<Blob>();
@@ -94,7 +94,7 @@ public class Commit implements Serializable {
             }
         }
         blobList.add(lo, blob);
-    }
+    }*/
 
     /* TODO: fill in the rest of this class. */
 }

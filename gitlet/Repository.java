@@ -4,6 +4,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static gitlet.Utils.*;
@@ -38,7 +39,7 @@ public class Repository {
     public static final File STAGEFOR_DELETION = join(GITLET_DIR, "stageforDeletion");
     public static final File COMMITS = join(GITLET_DIR, "commits");
     public static final File BLOBS = join(COMMITS, "blobs");
-    public static final File HEAD = join(GITLET_DIR, "commits", "HEAD.txt");
+    public static final File HEAD = join(COMMITS, "HEAD.txt");
 
     public static void setupInit() {
         if (GITLET_DIR.exists()) {
@@ -69,35 +70,22 @@ public class Repository {
         }
         File filecopy = join(STAGEFOR_ADDITION, args[1]);
         Commit newestCommit = getNewestCommit();
-        List<Blob> bloblist = newestCommit.getBlobList();
-        int index = indexOf(bloblist, args[1]);
-        if (index == -1) {
-            if (!filecopy.exists()) {
+        /*List<Blob> bloblist = newestCommit.getBlobList();
+        int index = indexOf(bloblist, args[1]);*/
+        HashMap<String, String> newestHashmap = newestCommit.getFileHashMap();
+        if (!newestHashmap.containsKey(args[1])) {
                 writeContents(filecopy, readContents(file));
-            } else {
-                if (readContents(file).equals(readContents(filecopy))) {
-                    return;
-                } else {
-                    writeContents(filecopy, readContents(file));
-                }
-            }
         } else {
-            Blob recentVersion = bloblist.get(index);
+            String recentVersion = newestHashmap.get(args[1]);
             if (!filecopy.exists()) {
-                if (Utils.sha1(readContents(file)).equals(recentVersion.getBlobID())) {
-                    return;
-                } else {
+                if (!Utils.sha1(readContents(file)).equals(recentVersion)) {
                     writeContents(filecopy, readContents(file));
                 }
             } else {
-                if (Utils.sha1(readContents(file)).equals(recentVersion.getBlobID())) {
+                if (Utils.sha1(readContents(file)).equals(recentVersion)) {
                     filecopy.delete();
-                } else {
-                    if (Utils.sha1(readContents(file)).equals(recentVersion.getBlobID())) {
-                        return;
-                    } else {
-                        writeContents(filecopy, readContents(file));
-                    }
+                }  else {
+                    writeContents(filecopy, readContents(file));
                 }
             }
         }
@@ -191,17 +179,20 @@ public class Repository {
         if (staged.size() == 0) {
             Main.exitWithError("No changes added to the commit.");
         } else {
-            ArrayList<Blob> defaultblob = getNewestCommit().getBlobList();
+            HashMap<String, String> defaultFilemap = getNewestCommit().getFileHashMap();
             Commit current = new Commit(args[1], new Date(),
-                    getNewestCommitID(), defaultblob);
+                    getNewestCommitID(), defaultFilemap);
             for (String a : staged) {
                 File b = join(STAGEFOR_ADDITION, a);
                 byte[] content = readContents(b);
                 String id = sha1(content);
-                Blob c = new Blob(a, id);
                 File version = join(BLOBS, id + ".txt");
                 writeContents(version, content);
-                current.addBlob(c);
+                if (defaultFilemap.containsKey(a)){
+                    defaultFilemap.replace(a, id);
+                } else {
+                    defaultFilemap.put(a, id);
+                }
                 b.delete();
             }
             String uid = sha1(serialize(current));
@@ -216,14 +207,13 @@ public class Repository {
 
     public static void setupCheckout1(String[] args) {
         String filename = args[2];
-        ArrayList<Blob> a = getNewestCommit().getBlobList();
-        int filepos = indexOf(a, filename);
-        if (filepos == -1) {
+        HashMap<String, String> newestFilemap = getNewestCommit().getFileHashMap();
+        if (!newestFilemap.containsKey(filename)) {
             Main.exitWithError("File does not exist in that commit.");
         }
-        File newFile = join(BLOBS, a.get(filepos).getBlobID() + ".txt");
-        File oldFile = join(CWD, filename);
-        writeContents(oldFile, readContents(newFile));
+        File tothisVersion = join(BLOBS, newestFilemap.get(filename) + ".txt");
+        File toBeChanged = join(CWD, filename);
+        writeContents(toBeChanged, readContents(tothisVersion));
     }
 
     public static void setupCheckout2(String[] args) {
@@ -232,14 +222,13 @@ public class Repository {
             Main.exitWithError("No commit with that id exists.");
         }
         Commit a = readObject(commitfile, Commit.class);
-        ArrayList<Blob> b = a.getBlobList();
-        int filepos = indexOf(b, args[3]);
-        if (filepos == -1) {
+        HashMap<String, String> tothisFilemap = getNewestCommit().getFileHashMap();
+        if (!tothisFilemap.containsKey(args[3])) {
             Main.exitWithError("File does not exist in that commit.");
         }
-        File newFile = join(BLOBS, b.get(filepos).getBlobID() + ".txt");
-        File oldFile = join(CWD, args[3]);
-        writeContents(oldFile, readContents(newFile));
+        File tothisVersion = join(BLOBS, tothisFilemap.get(args[3]) + ".txt");
+        File toBeChanged = join(CWD, args[3]);
+        writeContents(toBeChanged, readContents(tothisVersion));
     }
 
     /* TODO: fill in the rest of this class. */
