@@ -18,6 +18,7 @@ public class Head implements Serializable {
         return branchname;
     }
 
+
     @Override
     public String toString(){
         return commitID + "\r\n" + branchname;

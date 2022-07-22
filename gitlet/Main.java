@@ -12,9 +12,12 @@ public class Main {
      * <COMMAND> <OPERAND1> <OPERAND2> ...
      */
     public static void main(String[] args) {
+
         if (args.length == 0) {
             exitWithError("Please enter a command.");
         }
+
+
 
         String firstArg = args[0];
         switch (firstArg) {
@@ -30,6 +33,9 @@ public class Main {
             case "commit" -> {
                 gitletExist();
                 validateNumArgs("commit", args, 2);
+                if (args[1].equals("")) {
+                    exitWithError("Please enter a commit message.");
+                }
                 Repository.setupCommit(args);
             }
             case "log" -> {
@@ -37,15 +43,41 @@ public class Main {
                 validateNumArgs("log", args, 1);
                 Repository.setupLog();
             }
+            case "global-log" -> {
+                gitletExist();
+                validateNumArgs("log", args, 1);
+                Repository.setupGlobalLog();
+            }
             case "checkout" -> {
                 gitletExist();
                 if (args.length == 3) {
+                    if (!args[1].equals("--")){
+                        exitWithError("Incorrect operands.");
+                    }
                     Repository.setupCheckout1(args);
                 } else if (args.length == 4) {
+                    if (!args[2].equals("--")){
+                        exitWithError("Incorrect operands.");
+                    }
                     Repository.setupCheckout2(args);
                 } else {
                     exitWithError("Incorrect operands.");
                 }
+            }
+            case "rm" -> {
+                gitletExist();
+                validateNumArgs("rm", args, 2);
+                Repository.setupRemove(args[1]);
+            }
+            case "find" -> {
+                gitletExist();
+                validateNumArgs("find", args, 2);
+                Repository.setupFind(args[1]);
+            }
+            case "status" -> {
+                gitletExist();
+                validateNumArgs("status", args, 1);
+                Repository.setupStatus();
             }
             default -> exitWithError("No command with that name exists.");
         }
@@ -69,9 +101,6 @@ public class Main {
     public static void validateNumArgs(String cmd, String[] args, int n) {
         if (args.length != n) {
             exitWithError("Incorrect operands.");
-        }
-        if (cmd.equals("commit") && args[1].equals("")) {
-            exitWithError("Please enter a commit message.");
         }
     }
 
