@@ -44,12 +44,12 @@ public class TrieSet implements Serializable {
         boolean endOfString;
         HashMap<Character, Trienode> children = new HashMap<>();
 
-        public Trienode() {
+        Trienode() {
             item = '\u0000';
             endOfString = false;
         }
 
-        public Trienode(char item, boolean endOfString) {
+        Trienode(char item, boolean endOfString) {
             this.item = item;
             this.endOfString = endOfString;
         }

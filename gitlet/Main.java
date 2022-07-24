@@ -100,7 +100,8 @@ public class Main {
                 validateNumArgs("merge", args, 2);
                 Repository.setupMerge(args[1]);
             }
-            default -> exitWithError("No command with that name exists.");
+            default
+                    -> exitWithError("No command with that name exists.");
         }
     }
 

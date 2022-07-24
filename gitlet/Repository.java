@@ -9,10 +9,10 @@ import static gitlet.Utils.*;
 
 /**
  * Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
+ * Implements commands including init, add, commit, remove, log,
+ * global log, status, checkout 1, 2, 3, merge, reset, etc.
  *
- * @author TODO
+ * @author Ziya Xu, Jingzhi Zhou.
  */
 public class Repository {
     /**
@@ -31,17 +31,22 @@ public class Repository {
      */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
-    public static final File STAGEFOR_ADDITION = join(GITLET_DIR, "stageforAddition");
-    public static final File STAGEFOR_DELETION = join(GITLET_DIR, "stageforDeletion");
+    public static final File STAGEFOR_ADDITION
+            = join(GITLET_DIR, "stageforAddition");
+    public static final File STAGEFOR_DELETION
+            = join(GITLET_DIR, "stageforDeletion");
     public static final File COMMITS = join(GITLET_DIR, "commits");
     public static final File BLOBS = join(COMMITS, "blobs");
-    public static final File HEAD = join(GITLET_DIR, "HEAD.txt");
+    public static final File HEAD
+            = join(GITLET_DIR, "HEAD.txt");
     public static final File BRANCHES = join(GITLET_DIR, "branches");
-    public static final SimpleDateFormat FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
+    public static final SimpleDateFormat FORMAT
+            = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
 
     public static void setupInit() {
         if (GITLET_DIR.exists()) {
-            Main.exitWithError("A Gitlet version-control system already exists in the"
+            Main.exitWithError("A Gitlet version-control system"
+                    + "already exists in the"
                     + " current directory.");
         }
         GITLET_DIR.mkdir();
@@ -81,9 +86,8 @@ public class Repository {
         // don't have this file in current commit
         if (!newestHashmap.containsKey(fileName)) {
             writeContents(filecopy, readContents(file));
-        }
-        // have this file in current commit
-        else {
+            // have this file in current commit
+        } else {
             String recentVersion = newestHashmap.get(fileName);
 
             // don't have this file in stage
@@ -91,9 +95,8 @@ public class Repository {
                 if (!Utils.sha1(readContents(file)).equals(recentVersion)) {
                     writeContents(filecopy, readContents(file));
                 }
-            }
-            // have this file in stage
-            else {
+                // have this file in stage
+            } else {
                 if (Utils.sha1(readContents(file)).equals(recentVersion)) {
                     filecopy.delete();
                 } else {
@@ -136,7 +139,8 @@ public class Repository {
                 System.out.println("===");
                 System.out.println("commit " + a.substring(0, 40));
                 Commit current = readObject(join(COMMITS, a), Commit.class);
-                System.out.println("Date: " + FORMAT.format(current.getTimestamp()));
+                System.out.println("Date: "
+                        + FORMAT.format(current.getTimestamp()));
                 System.out.println(current.getMessage());
                 System.out.println();
             }
@@ -147,7 +151,8 @@ public class Repository {
         int count = 0;
         for (String filename : plainFilenamesIn(COMMITS)) {
             if (filename.length() > 40) {
-                Commit current = readObject(join(COMMITS, filename), Commit.class);
+                Commit current = readObject(join(COMMITS, filename),
+                        Commit.class);
                 if (current.getMessage().equals(message)) {
                     System.out.println(filename.substring(0, 40));
                     count++;
@@ -167,8 +172,10 @@ public class Repository {
         if (stagedforadd.size() == 0 && stagedfordel.size() == 0) {
             Main.exitWithError("No changes added to the commit.");
         } else {
-            HashMap<String, String> defaultFilemap = getNewestCommit().getFileHashMap();
-            Commit current = new Commit(message, new Date(), getNewestCommitID(), defaultFilemap);
+            HashMap<String, String> defaultFilemap
+                    = getNewestCommit().getFileHashMap();
+            Commit current = new Commit(message, new Date(),
+                    getNewestCommitID(), defaultFilemap);
             if (stagedforadd.size() != 0) {
                 for (String a : stagedforadd) {
                     File b = join(STAGEFOR_ADDITION, a);
@@ -210,7 +217,8 @@ public class Repository {
     //need to adjust with branch function
     //need to
     public static void setupCheckout1(String filename) {
-        HashMap<String, String> newestFilemap = getNewestCommit().getFileHashMap();
+        HashMap<String, String> newestFilemap
+                = getNewestCommit().getFileHashMap();
         if (!newestFilemap.containsKey(filename)) {
             Main.exitWithError("File does not exist in that commit.");
         }
@@ -251,7 +259,8 @@ public class Repository {
                 if (!isContentSame(
                         join(BLOBS, givenFileMap.get(a) + ".txt"),
                         join(CWD, a))) {
-                    Main.exitWithError("There is an untracked file in the way; delete it, or add and commit it first.");
+                    Main.exitWithError("There is an untracked file in the way;"
+                            + " delete it, or add and commit it first.");
                 }
             }
         }
@@ -294,7 +303,8 @@ public class Repository {
                 if (!isContentSame(
                         join(BLOBS, givenFileMap.get(a) + ".txt"),
                         join(CWD, a))) {
-                    Main.exitWithError("There is an untracked file in the way; delete it, or add and commit it first.");
+                    Main.exitWithError("There is an untracked file in the way;"
+                            + " delete it, or add and commit it first.");
                 }
             }
         }
@@ -348,7 +358,8 @@ public class Repository {
         System.out.println();
         System.out.println("=== Modifications Not Staged For Commit ===");
 
-        HashMap<String, String> newestHashmap = getNewestCommit().getFileHashMap();
+        HashMap<String, String> newestHashmap
+                = getNewestCommit().getFileHashMap();
         LinkedList<String> listOfMod = new LinkedList<>();
         LinkedList<String> listOfUntracked = new LinkedList<>();
 
@@ -358,23 +369,21 @@ public class Repository {
             File inStage = join(STAGEFOR_ADDITION, a);
             // exist in stage
             if (inStage.exists()) {
-                if (!sha1(readContents(inCwd)).equals(sha1(readContents(inStage)))) {
+                if (!isContentSame(inCwd, inStage)) {
                     listOfMod.add(a + " (modified)");
                 }
-            }
-            // don't exist in stage
-            else {
+                // don't exist in stage
+            } else {
 
                 // have this file in current commit
                 if (newestHashmap.containsKey(a)) {
                     String recentVersion = newestHashmap.get(a);
                     // have different contents
-                    if (!Utils.sha1(readContents(inCwd)).equals(recentVersion)) {
+                    if (!sha1(readContents(inCwd)).equals(recentVersion)) {
                         listOfMod.add(a + " (modified)");
                     }
-                }
-                // don't have this file in current commit
-                else {
+                    // don't have this file in current commit
+                } else {
                     listOfUntracked.add(a);
                 }
             }
@@ -457,23 +466,25 @@ public class Repository {
         if (!givenbranch.exists()) {
             Main.exitWithError("A branch with that name does not exist.");
         }
-        String givenbranchCommitID = readContentsAsString(givenbranch);
-        String currbranchCommitID = readContentsAsString(currbranch);
+        String gibranID = readContentsAsString(givenbranch);
+        String curbranID = readContentsAsString(currbranch);
         String splitpointID = "";
-        List<String> givenBranchAncestor = getAllParent(givenbranchCommitID);
-        List<String> currBranchAncestor = getAllParent(currbranchCommitID);
-        for (int i = 0; i < Math.min(givenBranchAncestor.size(), currBranchAncestor.size()); i++) {
-            if (givenBranchAncestor.get(i).equals(currBranchAncestor.get(i))) {
-                splitpointID = givenBranchAncestor.get(i);
+        List<String> giBranAnces = getAllParent(gibranID);
+        List<String> curBranAnces = getAllParent(curbranID);
+        for (int i = 0;
+             i < Math.min(giBranAnces.size(), curBranAnces.size()); i++) {
+            if (giBranAnces.get(i).equals(curBranAnces.get(i))) {
+                splitpointID = giBranAnces.get(i);
             } else {
                 break;
             }
         }
 
-        if (splitpointID.equals(givenbranchCommitID)) {
-            Main.exitWithError("Given branch is an ancestor of the current branch.");
+        if (splitpointID.equals(gibranID)) {
+            Main.exitWithError("Given branch is"
+                    + " an ancestor of the current branch.");
         }
-        if (splitpointID.equals(currbranchCommitID)) {
+        if (splitpointID.equals(curbranID)) {
             setupCheckout3(branchName);
             Main.exitWithError("Current branch fast-forwarded.");
         }
@@ -492,65 +503,66 @@ public class Repository {
                 if (!isContentSame(
                         join(BLOBS, givenmap.get(a) + ".txt"),
                         join(CWD, a))) {
-                    Main.exitWithError("There is an untracked file in the way; delete it, or add and commit it first.");
+                    Main.exitWithError("There is an untracked file in the way;"
+                            + " delete it, or add and commit it first.");
                 }
             }
         }
         // file in given commit
         for (String filename : givenmap.keySet()) {
+            String s = splitmap.get(filename);
+            String c = currmap.get(filename);
+            String g = givenmap.get(filename);
             // file exist in split commit
             if (splitmap.containsKey(filename)) {
                 // file exist in current commit
                 if (currmap.containsKey(filename)) {
                     // file contents in given and current different
-                    if (!givenmap.get(filename).equals(currmap.get(filename))) {
+                    if (!g.equals(c)) {
                         // file modified in given, unmodified in current branch
-                        if (!splitmap.get(filename).equals(givenmap.get(filename))
-                                && splitmap.get(filename).equals(currmap.get(filename))) {
-                            setupCheckout2(readContentsAsString(givenbranch), filename);
+                        if (!s.equals(g) && s.equals(c)) {
+                            setupCheckout2(readContentsAsString(givenbranch),
+                                    filename);
                             setupAdd(filename);
-                        }
-                        // file modified in given, modified in current branch, different
-                        else if (!splitmap.get(filename).equals(givenmap.get(filename))
-                                && !splitmap.get(filename).equals(currmap.get(filename))) {
-                            writeContents(join(CWD, filename), "<<<<<<< HEAD\r\n",
-                                    readContents(join(BLOBS, currmap.get(filename) + ".txt")),
+                            // file modified in given and in current branch
+                        } else if (!s.equals(g)
+                                && !s.equals(c)) {
+                            writeContents(join(CWD, filename),
+                                    "<<<<<<< HEAD\r\n",
+                                    readContents(join(BLOBS, c + ".txt")),
                                     "=======\r\n",
-                                    readContents(join(BLOBS, givenmap.get(filename) + ".txt")),
+                                    readContents(join(BLOBS, g + ".txt")),
                                     ">>>>>>>\r\n");
                             count++;
                             setupAdd(filename);
                         }
                     }
-                }
-                // file doesn't exist in current commit
-                else {
-                    if (!splitmap.get(filename).equals(givenmap.get(filename))) {
+                    // file doesn't exist in current commit
+                } else {
+                    if (!s.equals(g)) {
                         writeContents(join(CWD, filename), "<<<<<<< HEAD\r\n",
                                 "=======\r\n",
-                                readContents(join(BLOBS, givenmap.get(filename) + ".txt")),
+                                readContents(join(BLOBS, g + ".txt")),
                                 ">>>>>>>\r\n");
                         count++;
                         setupAdd(filename);
                     }
                 }
-            }
-            // file doesn't exist in split commit
-            else {
+                // file doesn't exist in split commit
+            } else {
                 // file exist in current
                 if (currmap.containsKey(filename)) {
-                    if (!currmap.get(filename).equals(givenmap.get(filename))) {
+                    if (!c.equals(g)) {
                         writeContents(join(CWD, filename), "<<<<<<< HEAD\r\n",
-                                readContents(join(BLOBS, currmap.get(filename) + ".txt")),
+                                readContents(join(BLOBS, c + ".txt")),
                                 "=======\r\n",
-                                readContents(join(BLOBS, givenmap.get(filename) + ".txt")),
+                                readContents(join(BLOBS, g + ".txt")),
                                 ">>>>>>>\r\n");
                         count++;
                         setupAdd(filename);
                     }
-                }
-                // file doesn't exist in current
-                else {
+                    // file doesn't exist in current
+                } else {
                     setupCheckout2(readContentsAsString(givenbranch), filename);
                     setupAdd(filename);
                 }
@@ -564,21 +576,24 @@ public class Repository {
                 if (splitmap.containsKey(filename)) {
                     // file modified in current, deleted in given
                     if (!splitmap.get(filename).equals(currmap.get(filename))) {
-                        writeContents(join(CWD, filename), "<<<<<<< HEAD\r\n",
-                                readContents(join(BLOBS, currmap.get(filename) + ".txt")),
+                        writeContents(join(CWD, filename),
+                                "<<<<<<< HEAD\r\n",
+                                readContents(join(BLOBS, currmap.get(filename)
+                                        + ".txt")),
                                 "=======\r\n",
                                 ">>>>>>>\r\n");
                         count++;
                         setupAdd(filename);
-                    }
-                    // file unmodified in current, deleted in given
-                    else {
+                        // file unmodified in current, deleted in given
+                    } else {
                         setupRemove(filename);
                     }
                 }
             }
         }
-        setupCommit("Merged " + branchName + " into " + getCurrentBranch() + ".", readContentsAsString(givenbranch));
+        setupCommit("Merged " + branchName
+                + " into " + getCurrentBranch()
+                + ".", readContentsAsString(givenbranch));
         if (count > 0) {
             System.out.println("Encountered a merge conflict.");
         }
@@ -592,7 +607,8 @@ public class Repository {
         String parent = a.getParent();
         String parent2 = a.getParent2();
         if (parent2 != null) {
-            System.out.println("Merge: " + parent.substring(0, 7) + " " + parent2.substring(0, 7));
+            System.out.println("Merge: " + parent.substring(0, 7) + " "
+                    + parent2.substring(0, 7));
         }
         System.out.println("Date: " + FORMAT.format(a.getTimestamp()));
         System.out.println(a.getMessage());
@@ -645,5 +661,4 @@ public class Repository {
             return "";
         }
     }
-    /* TODO: fill in the rest of this class. */
 }
