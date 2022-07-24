@@ -40,6 +40,8 @@ public class Commit implements Serializable {
      */
     private String parent;
 
+    private String parent2;
+
     /**
      *
      */
@@ -75,26 +77,11 @@ public class Commit implements Serializable {
         return fileHashMap;
     }
 
-/*
-    public void addBlob(Blob blob) {
-        if (blobList == null) {
-            blobList = new ArrayList<Blob>();
-        }
-        int lo = 0;
-        int hi = blobList.size() - 1;
-        while (lo <= hi) {
-            int mid = lo + (hi - lo) / 2;
-            if (blob.compareTo(blobList.get(mid)) < 0) {
-                hi = mid - 1;
-            } else if (blob.compareTo(blobList.get(mid)) > 0) {
-                lo = mid + 1;
-            } else {
-                blobList.set(mid, blob);
-                return;
-            }
-        }
-        blobList.add(lo, blob);
-    }*/
+    public String getParent2() {
+        return parent2;
+    }
 
-    /* TODO: fill in the rest of this class. */
+    public void addParent2(String parent2){
+        this.parent2 = parent2;
+    }
 }

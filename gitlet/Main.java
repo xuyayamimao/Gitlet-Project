@@ -28,7 +28,7 @@ public class Main {
             case "add" -> {
                 gitletExist();
                 validateNumArgs("add", args, 2);
-                Repository.setupAdd(args);
+                Repository.setupAdd(args[1]);
             }
             case "commit" -> {
                 gitletExist();
@@ -36,7 +36,7 @@ public class Main {
                 if (args[1].equals("")) {
                     exitWithError("Please enter a commit message.");
                 }
-                Repository.setupCommit(args);
+                Repository.setupCommit(args[1], "");
             }
             case "log" -> {
                 gitletExist();
@@ -95,6 +95,11 @@ public class Main {
                 gitletExist();
                 validateNumArgs("reset", args, 2);
                 Repository.setupReset(args[1]);
+            }
+            case "merge" -> {
+                gitletExist();
+                validateNumArgs("merge", args, 2);
+                Repository.setupMerge(args[1]);
             }
             default -> exitWithError("No command with that name exists.");
         }
