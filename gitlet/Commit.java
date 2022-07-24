@@ -7,9 +7,9 @@ import java.util.HashMap;
 
 /**
  * Represents a gitlet commit object.
- *  Constructs Commit object with message, timestamp, parent commit 1 and 2,
- *  and a map of files contained in this commit.
- *  Used to construct commit tree.
+ * Constructs Commit object with message, timestamp, parent commit 1 and 2,
+ * and a map of files contained in this commit.
+ * Used to construct commit tree.
  *
  * @author Ziya Xu, Jingzhi Zhou.
  */

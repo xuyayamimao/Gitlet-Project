@@ -82,8 +82,7 @@ public class Main {
                 validateNumArgs("merge", args, 2);
                 Repository.setupMerge(args[1]);
             }
-            default
-                    -> exitWithError("No command with that name exists.");
+            default -> exitWithError("No command with that name exists.");
         }
     }
 
@@ -121,9 +120,10 @@ public class Main {
 
     /**
      * finish the checkout command according to the input args
+     *
      * @param args the args come with the checkout command
      */
-    public static void checkouthelper(String[] args){
+    public static void checkouthelper(String[] args) {
         if (args.length == 3) {
             if (!args[1].equals("--")) {
                 exitWithError("Incorrect operands.");
