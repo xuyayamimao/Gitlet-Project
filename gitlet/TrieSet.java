@@ -1,13 +1,14 @@
 package gitlet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-public class TrieSet{
+public class TrieSet implements Serializable{
 
-    private class Trienode {
+    private class Trienode implements Serializable {
         char item;
         boolean endOfString;
         HashMap<Character, Trienode> children = new HashMap<>();
