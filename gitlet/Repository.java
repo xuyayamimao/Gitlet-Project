@@ -38,7 +38,6 @@ public class Repository {
     public static final File BLOBS = join(COMMITS, "blobs");
     public static final File HEAD = join(GITLET_DIR, "HEAD.txt");
     public static final File BRANCHES = join(GITLET_DIR, "branches");
-    public static final File SPLITPOINTS = join(BRANCHES, "splitpoints");
     public static final SimpleDateFormat FORMAT = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
     public static void setupInit() {
         if (GITLET_DIR.exists()) {
@@ -54,7 +53,6 @@ public class Repository {
         File initialcommit = join(COMMITS, commmit0filename);
         writeObject(initialcommit, initial);
         BRANCHES.mkdir();
-        SPLITPOINTS.mkdir();
         File main = join(BRANCHES, "main.txt");
         writeContents(main, uid);
         Head head0 = new Head(uid, "main");
@@ -422,8 +420,6 @@ public class Repository {
             Main.exitWithError("A branch with that name already exists.");
         }
         writeContents(newBranch, getNewestCommitID());
-        File splitpoint = join(SPLITPOINTS, getCurrentBranch() + "&" +branchName + "splitpoint" +".txt");
-        writeContents(splitpoint, getNewestCommitID());
     }
 
     public static void setupRmBranch(String branchName){
@@ -437,33 +433,53 @@ public class Repository {
         branch.delete();
     }
 
-    public static void setupMerge(String branchName){
-        File givenbranch = join(BRANCHES, branchName + ".txt");
-        File splitpoint = join(SPLITPOINTS, getCurrentBranch() + "&" + branchName + "splitpoint" + ".txt");
-        if (!splitpoint.exists()){
-            splitpoint = join(SPLITPOINTS, branchName + "&" + getCurrentBranch() + "splitpoint" + ".txt");
+    private static List<String> getAllParent(String id){
+        String parent = getCommit(id).getParent();
+        List<String> a;
+        if (parent == null){
+            a = new ArrayList<>();
+        } else {
+            a = getAllParent(parent);
         }
-        File currbranch = join(BRANCHES, getCurrentBranch() +".txt");
+        a.add(id);
+        return a;
+    }
+    public static void setupMerge(String branchName){
         List<String> stagedforadd = plainFilenamesIn(STAGEFOR_ADDITION);
         List<String> stagedfordel = plainFilenamesIn(STAGEFOR_DELETION);
         if (stagedforadd.size() != 0 || stagedfordel.size() != 0) {
             Main.exitWithError("You have uncommitted changes.");
         }
-        if (!givenbranch.exists()){
-            Main.exitWithError("A branch with that name does not exist.");
-        }
         if (branchName.equals(getCurrentBranch())){
             Main.exitWithError("Cannot merge a branch with itself.");
         }
-        if (isContentSame(splitpoint, givenbranch)) {
+        File givenbranch = join(BRANCHES, branchName + ".txt");
+        File currbranch = join(BRANCHES, getCurrentBranch() +".txt");
+        if (!givenbranch.exists()){
+            Main.exitWithError("A branch with that name does not exist.");
+        }
+        String givenbranchCommitID = readContentsAsString(givenbranch);
+        String currbranchCommitID = readContentsAsString(currbranch);
+        String splitpointID = "";
+        List<String> givenBranchAncestor = getAllParent(givenbranchCommitID);
+        List<String> currBranchAncestor = getAllParent(currbranchCommitID);
+        for (int i = 0; i < Math.min(givenBranchAncestor.size(), currBranchAncestor.size()); i++){
+            if (givenBranchAncestor.get(i).equals(currBranchAncestor.get(i))){
+                splitpointID = givenBranchAncestor.get(i);
+            } else {
+                break;
+            }
+        }
+
+        if (splitpointID.equals(givenbranchCommitID)) {
             Main.exitWithError("Given branch is an ancestor of the current branch.");
         }
-        if (isContentSame(splitpoint, currbranch)){
+        if (splitpointID.equals(currbranchCommitID)){
             setupCheckout3(branchName);
             Main.exitWithError("Current branch fast-forwarded.");
         }
         Commit givencommit = getCommit(readContentsAsString(givenbranch));
-        Commit splitcommit = getCommit(readContentsAsString(splitpoint));
+        Commit splitcommit = getCommit(splitpointID);
         Commit currcommit = getNewestCommit();
         HashMap<String, String> givenmap = givencommit.getFileHashMap();
         HashMap<String, String> splitmap = splitcommit.getFileHashMap();
