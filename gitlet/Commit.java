@@ -2,12 +2,9 @@ package gitlet;
 
 // TODO: any imports you need here
 
-import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 /**
  * Represents a gitlet commit object.
@@ -81,7 +78,7 @@ public class Commit implements Serializable {
         return parent2;
     }
 
-    public void addParent2(String parent2){
+    public void addParent2(String parent2) {
         this.parent2 = parent2;
     }
 }

@@ -1,9 +1,5 @@
 package gitlet;
 
-import edu.princeton.cs.algs4.BinarySearch;
-
-import java.util.ArrayList;
-
 public class BinarySearchTree<T extends Comparable<T>> {
 
     protected TreeNode root;
@@ -21,43 +17,41 @@ public class BinarySearchTree<T extends Comparable<T>> {
         return containsHelper(root, key);
     }
 
-    private boolean containsHelper(TreeNode t, T key){
-        if (t == null){
+    private boolean containsHelper(TreeNode t, T key) {
+        if (t == null) {
             return false;
         }
-        if (t.item == key){
+        if (t.item == key) {
             return true;
         }
-        if (key.compareTo(t.item) < 0){
+        if (key.compareTo(t.item) < 0) {
             return containsHelper(t.left, key);
-        }
-        else {
+        } else {
             return containsHelper(t.right, key);
         }
     }
 
     /* Adds a node for KEY iff KEY isn't in the BST already. */
     public void add(T key) {
-        if (root == null){
+        if (root == null) {
             root = new TreeNode(key);
             return;
         }
         addsHelper(root, key);
     }
 
-    private void addsHelper(TreeNode t, T key){
-        if (t.item == key){
+    private void addsHelper(TreeNode t, T key) {
+        if (t.item == key) {
             return;
         }
-        if (key.compareTo(t.item) < 0){
-            if (t.left == null){
+        if (key.compareTo(t.item) < 0) {
+            if (t.left == null) {
                 t.left = new TreeNode(key);
                 return;
             }
             addsHelper(t.left, key);
-        }
-        else {
-            if (t.right == null){
+        } else {
+            if (t.right == null) {
                 t.right = new TreeNode(key);
                 return;
             }
@@ -137,7 +131,8 @@ public class BinarySearchTree<T extends Comparable<T>> {
         int size = 0;
 
         public TreeNode(T item) {
-            this.item = item; left = right = null;
+            this.item = item;
+            left = right = null;
         }
 
         public TreeNode(T item, TreeNode left, TreeNode right) {

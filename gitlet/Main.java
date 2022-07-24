@@ -3,7 +3,7 @@ package gitlet;
 /**
  * Driver class for Gitlet, a subset of the Git version-control system.
  *
- * @author TODO
+ * @author Ziya Xu, Jingzhi Zhou
  */
 public class Main {
 
@@ -16,7 +16,6 @@ public class Main {
         if (args.length == 0) {
             exitWithError("Please enter a command.");
         }
-
 
 
         String firstArg = args[0];
@@ -51,16 +50,16 @@ public class Main {
             case "checkout" -> {
                 gitletExist();
                 if (args.length == 3) {
-                    if (!args[1].equals("--")){
+                    if (!args[1].equals("--")) {
                         exitWithError("Incorrect operands.");
                     }
                     Repository.setupCheckout1(args[2]);
                 } else if (args.length == 4) {
-                    if (!args[2].equals("--")){
+                    if (!args[2].equals("--")) {
                         exitWithError("Incorrect operands.");
                     }
                     Repository.setupCheckout2(args[1], args[3]);
-                } else if (args.length == 2){
+                } else if (args.length == 2) {
                     Repository.setupCheckout3(args[1]);
                 } else {
                     exitWithError("Incorrect operands.");
