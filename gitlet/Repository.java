@@ -1,5 +1,6 @@
 package gitlet;
 
+import javax.swing.*;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -161,7 +162,7 @@ public class Repository {
 
     //need to adjust with branch function
     public static void setupCommit(String[] args) {
-        File branch = join(BRANCHES, getBranch() + ".txt");
+        File branch = join(BRANCHES, getCurrentBranch() + ".txt");
         List<String> stagedforadd = plainFilenamesIn(STAGEFOR_ADDITION);
         List<String> stagedfordel = plainFilenamesIn(STAGEFOR_DELETION);
         if (stagedforadd.size() == 0  && stagedfordel.size() == 0) {
@@ -197,15 +198,17 @@ public class Repository {
             File commit = join(COMMITS, commmitFilename);
             writeObject(commit, current);
             writeContents(branch, uid);
-            writeObject(HEAD, new Head(uid, getBranch()));
+            Head old = readObject(HEAD, Head.class);
+            old.setCommitID(uid);
+            old.addCommitID(uid);
+            writeObject(HEAD, old);
         }
 
     }
 
     //need to adjust with branch function
     //need to
-    public static void setupCheckout1(String[] args) {
-        String filename = args[2];
+    public static void setupCheckout1(String filename) {
         HashMap<String, String> newestFilemap = getNewestCommit().getFileHashMap();
         if (!newestFilemap.containsKey(filename)) {
             Main.exitWithError("File does not exist in that commit.");
@@ -215,25 +218,114 @@ public class Repository {
         writeContents(toBeChanged, readContents(tothisVersion));
     }
 
-    public static void setupCheckout2(String[] args) {
-        File commitfile = join(COMMITS, args[1] + ".txt");
-        if (!commitfile.exists()) {
-            Main.exitWithError("No commit with that id exists.");
-        }
-        Commit a = readObject(commitfile, Commit.class);
+    public static void setupCheckout2(String commitID, String filename) {
+        String fullId = getFullCommitID(commitID);
+        Commit a = getCommit(fullId);
         HashMap<String, String> tothisFilemap = a.getFileHashMap();
-        if (!tothisFilemap.containsKey(args[3])) {            Main.exitWithError("File does not exist in that commit.");
+        if (!tothisFilemap.containsKey(filename)) {
+            Main.exitWithError("File does not exist in that commit.");
         }
-        File tothisVersion = join(BLOBS, tothisFilemap.get(args[3]) + ".txt");
-        File toBeChanged = join(CWD, args[3]);
+        File tothisVersion = join(BLOBS, tothisFilemap.get(filename) + ".txt");
+        File toBeChanged = join(CWD, filename);
         writeContents(toBeChanged, readContents(tothisVersion));
     }
 
+    public static void setupCheckout3(String branchName){
+        if (branchName.equals(getCurrentBranch())){
+            Main.exitWithError("No need to checkout the current branch.");
+        }
+        File branch = join(BRANCHES, branchName + ".txt");
+        if (!branch.exists()){
+            Main.exitWithError("No such branch exists.");
+        }
+        Commit givenCommit = getCommit(readContentsAsString(branch));
+        Commit current = getNewestCommit();
+        HashMap<String, String> currentFileMap = current.getFileHashMap();
+        HashMap<String, String> givenFileMap = givenCommit.getFileHashMap();
+        //file in CWD
+        for (String a : plainFilenamesIn(CWD)) {
+            //not tracked by current commit but tracked by given commit
+            if (!currentFileMap.containsKey(a) && givenFileMap.containsKey(a)) {
+                // content is not same, will be overwritten
+                if (!isContentSame(
+                        join(BLOBS, givenFileMap.get(a) + ".txt"),
+                        join(CWD, a))) {
+                    Main.exitWithError("There is an untracked file in the way; delete it, or add and commit it first.");
+                }
+            }
+        }
+        // tracked in current commit but not by given commit
+        for (String key : currentFileMap.keySet()){
+            //not tracked by given commit but tracked by current commit
+            if (join(CWD, key).exists() && !givenFileMap.containsKey(key)){
+                restrictedDelete(join(CWD, key));
+            }
+        }
+        for (String key : givenFileMap.keySet()){
+            writeContents(join(CWD, key),
+                    readContents(join(BLOBS, givenFileMap.get(key) + ".txt")));
+        }
+        Head old = readObject(HEAD, Head.class);
+        old.setCommitID(readContentsAsString(branch));
+        old.setBranchname(branchName);
+        writeObject(HEAD, old);
+        //delete file in stage for del
+        for (String key : plainFilenamesIn(STAGEFOR_DELETION)){
+            join(STAGEFOR_DELETION, key).delete();
+        }
+        //delete file in stage for add
+        for (String key : plainFilenamesIn(STAGEFOR_ADDITION)){
+            join(STAGEFOR_ADDITION, key).delete();
+        }
+    }
 
+    public static void setupReset(String id){
+        String commitId = getFullCommitID(id);
+        Commit givenCommit = getCommit(commitId);
+        Commit current = getNewestCommit();
+        HashMap<String, String> currentFileMap = current.getFileHashMap();
+        HashMap<String, String> givenFileMap = givenCommit.getFileHashMap();
+        //file in CWD
+        for (String a : plainFilenamesIn(CWD)) {
+            //not tracked by current commit but tracked by given commit
+            if (!currentFileMap.containsKey(a) && givenFileMap.containsKey(a)) {
+                // content is not same, will be overwritten
+                if (!isContentSame(
+                        join(BLOBS, givenFileMap.get(a) + ".txt"),
+                        join(CWD, a))) {
+                    Main.exitWithError("There is an untracked file in the way; delete it, or add and commit it first.");
+                }
+            }
+        }
+        File currentBranch = join(BRANCHES, getCurrentBranch() + ".txt");
+        writeContents(currentBranch, id);
+        // tracked in current commit but not by given commit
+        for (String key : currentFileMap.keySet()){
+            //not tracked by given commit but tracked by current commit
+            if (join(CWD, key).exists() && !givenFileMap.containsKey(key)){
+                restrictedDelete(join(CWD, key));
+            }
+        }
+        for (String key : givenFileMap.keySet()){
+            writeContents(join(CWD, key),
+                    readContents(join(BLOBS, givenFileMap.get(key) + ".txt")));
+        }
+        Head old = readObject(HEAD, Head.class);
+        old.setCommitID(commitId);
+        writeObject(HEAD, old);
+        //delete file in stage for del
+        for (String key : plainFilenamesIn(STAGEFOR_DELETION)){
+            join(STAGEFOR_DELETION, key).delete();
+        }
+        //delete file in stage for add
+        for (String key : plainFilenamesIn(STAGEFOR_ADDITION)){
+            join(STAGEFOR_ADDITION, key).delete();
+        }
+    }
 
     public static void setupStatus(){
         System.out.println("=== Branches ===");
-        String currentBranch = getBranch();
+        String currentBranch = getCurrentBranch();
         for (String a  : plainFilenamesIn(BRANCHES)){
             String toPrint = a.substring(0, a.length() - 4);
             if (toPrint.equals(currentBranch)){
@@ -320,6 +412,25 @@ public class Repository {
         }
     }
 
+    public static void setupBranch(String branchName){
+        File newBranch = join(BRANCHES, branchName + ".txt");
+        if (newBranch.exists()){
+            Main.exitWithError("A branch with that name already exists.");
+        }
+        writeContents(newBranch, getNewestCommitID());
+    }
+
+    public static void setupRmBranch(String branchName){
+        File branch = join(BRANCHES, branchName + ".txt");
+        if (!branch.exists()){
+            Main.exitWithError("A branch with that name does not exist.");
+        }
+        if (getCurrentBranch().equals(branchName)){
+            Main.exitWithError("Cannot remove the current branch.");
+        }
+        branch.delete();
+    }
+
     //need to adjust with branch function
     private static void logHelper(Commit a, String id) {
         System.out.println("===");
@@ -338,50 +449,20 @@ public class Repository {
         logHelper(readObject(next, Commit.class), parent);
     }
 
-
-    /**
-     * Returns the index of the specified file in the Blob array.
-     *
-     * <p>
-     * Adapt from the indexOf method in class BinarySearch in package edu.princeton.cs.algs4;
-     * <p>
-     * public static int indexOf(int[] a, int key) {
-     * int lo = 0;
-     * int hi = a.length - 1;
-     * while (lo <= hi) {
-     * // Key is in a[lo..hi] or not present.
-     * int mid = lo + (hi - lo) / 2;
-     * if      (key < a[mid]) hi = mid - 1;
-     * else if (key > a[mid]) lo = mid + 1;
-     * else return mid;
-     * }
-     * return -1;
-     * }
-     */
-    /*public static int indexOf(List<Blob> blobs, String filename) {
-        if (blobs == null) {
-            return -1;
-        }
-        int lo = 0;
-        int hi = blobs.size() - 1;
-        while (lo <= hi) {
-            int mid = lo + (hi - lo) / 2;
-            if (filename.compareTo(blobs.get(mid).getFilename()) < 0) {
-                hi = mid - 1;
-            } else if (filename.compareTo(blobs.get(mid).getFilename()) > 0) {
-                lo = mid + 1;
-            } else {
-                return mid;
-            }
-        }
-        return -1;
-    }*/
-
     public static Commit getNewestCommit() {
         Head a = readObject(HEAD, Head.class);
         String commitPath = a.getCommitID() + ".txt";
-        File newestCommit = join(GITLET_DIR, "commits", commitPath);
+        File newestCommit = join(COMMITS, commitPath);
         return readObject(newestCommit, Commit.class);
+    }
+
+    public static Commit getCommit(String id) {
+        String commitPath = id + ".txt";
+        File commit = join(COMMITS, commitPath);
+        if (!commit.exists()){
+            Main.exitWithError("No commit with that id exists.");
+        }
+        return readObject(commit, Commit.class);
     }
 
     public static String getNewestCommitID() {
@@ -389,9 +470,23 @@ public class Repository {
         return a.getCommitID();
     }
 
-    public static String getBranch() {
+    public static String getCurrentBranch() {
         return readObject(HEAD, Head.class).getBranch();
     }
 
+    public static boolean isContentSame(File a, File b){
+        return sha1(readContents(a)).equals(sha1(readContents(b)));
+    }
+
+    public static String getFullCommitID(String prefix){
+        Head a = readObject(HEAD, Head.class);
+        if(a.getIdSet().containsPrefix(prefix)){
+            return a.getIdSet().keysWithPrefix(prefix).get(0);
+        }
+        else {
+            Main.exitWithError("No commit with that id exists.");
+            return "";
+        }
+    }
     /* TODO: fill in the rest of this class. */
 }

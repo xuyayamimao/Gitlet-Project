@@ -54,12 +54,14 @@ public class Main {
                     if (!args[1].equals("--")){
                         exitWithError("Incorrect operands.");
                     }
-                    Repository.setupCheckout1(args);
+                    Repository.setupCheckout1(args[2]);
                 } else if (args.length == 4) {
                     if (!args[2].equals("--")){
                         exitWithError("Incorrect operands.");
                     }
-                    Repository.setupCheckout2(args);
+                    Repository.setupCheckout2(args[1], args[3]);
+                } else if (args.length == 2){
+                    Repository.setupCheckout3(args[1]);
                 } else {
                     exitWithError("Incorrect operands.");
                 }
@@ -78,6 +80,21 @@ public class Main {
                 gitletExist();
                 validateNumArgs("status", args, 1);
                 Repository.setupStatus();
+            }
+            case "branch" -> {
+                gitletExist();
+                validateNumArgs("branch", args, 2);
+                Repository.setupBranch(args[1]);
+            }
+            case "rm-branch" -> {
+                gitletExist();
+                validateNumArgs("rm-branch", args, 2);
+                Repository.setupRmBranch(args[1]);
+            }
+            case "reset" -> {
+                gitletExist();
+                validateNumArgs("reset", args, 2);
+                Repository.setupReset(args[1]);
             }
             default -> exitWithError("No command with that name exists.");
         }
