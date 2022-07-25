@@ -42,6 +42,8 @@ public class Commit implements Serializable {
 
     private String parent2;
 
+    private int level;
+
     /**
      *
      */
@@ -52,13 +54,19 @@ public class Commit implements Serializable {
         timestamp = new Date(0);
         parent = null;
         fileHashMap = new HashMap<>();
+        level = 0;
     }
 
-    public Commit(String message, Date timestamp, String parent, HashMap<String, String> fileHashMap) {
+    public Commit(String message, Date timestamp, String parent, HashMap<String, String> fileHashMap, int level) {
         this.message = message;
         this.timestamp = timestamp;
         this.parent = parent;
         this.fileHashMap = fileHashMap;
+        this.level = level;
+    }
+
+    public int getLevel(){
+        return level;
     }
 
     public String getMessage() {

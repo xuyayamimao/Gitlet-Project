@@ -168,8 +168,10 @@ public class Repository {
             Main.exitWithError("No changes added to the commit.");
         }
         else {
-            HashMap<String, String> defaultFilemap = getNewestCommit().getFileHashMap();
-            Commit current = new Commit(message, new Date(), getNewestCommitID(), defaultFilemap);
+            Commit oldCommit = getNewestCommit();
+            HashMap<String, String> defaultFilemap = oldCommit.getFileHashMap();
+            int level = oldCommit.getLevel() + 1;
+            Commit current = new Commit(message, new Date(), getNewestCommitID(), defaultFilemap, level);
             if (stagedforadd.size() != 0) {
                 for (String a : stagedforadd) {
                     File b = join(STAGEFOR_ADDITION, a);
@@ -433,17 +435,41 @@ public class Repository {
         branch.delete();
     }
 
-    private static List<String> getAllParent(String id){
-        String parent = getCommit(id).getParent();
-        List<String> a;
-        if (parent == null){
-            a = new ArrayList<>();
-        } else {
-            a = getAllParent(parent);
-        }
-        a.add(id);
+    private static HashMap<String, Integer> getAllParent(String id){
+        HashMap<String, Integer> a = new HashMap<>();
+        getAllParentHelper(a, id);
         return a;
     }
+
+    private static void getAllParentHelper(HashMap<String, Integer> record, String id){
+        Commit current = getCommit(id);
+        String parent = current.getParent();
+        String parent2 = current.getParent2();
+        int level = current.getLevel();
+        record.put(id, level);
+        if (parent != null){
+            getAllParentHelper(record, parent);
+        }
+        if (parent2 != null){
+            getAllParentHelper(record, parent2);
+        }
+    }
+
+    private static String getSplitpointId(String branch1ID, String branch2ID){
+        String splitpointID = "";
+        HashMap<String, Integer> givenBranchAncestor = getAllParent(branch1ID);
+        HashMap<String, Integer> currBranchAncestor = getAllParent(branch2ID);
+        int levelrecord = -1;
+        for (String key : givenBranchAncestor.keySet()){
+            if (currBranchAncestor.containsKey(key)) {
+                if (currBranchAncestor.get(key) > levelrecord) {
+                    splitpointID = key;
+                }
+            }
+        }
+        return splitpointID;
+    }
+
     public static void setupMerge(String branchName){
         List<String> stagedforadd = plainFilenamesIn(STAGEFOR_ADDITION);
         List<String> stagedfordel = plainFilenamesIn(STAGEFOR_DELETION);
@@ -460,16 +486,8 @@ public class Repository {
         }
         String givenbranchCommitID = readContentsAsString(givenbranch);
         String currbranchCommitID = readContentsAsString(currbranch);
-        String splitpointID = "";
-        List<String> givenBranchAncestor = getAllParent(givenbranchCommitID);
-        List<String> currBranchAncestor = getAllParent(currbranchCommitID);
-        for (int i = 0; i < Math.min(givenBranchAncestor.size(), currBranchAncestor.size()); i++){
-            if (givenBranchAncestor.get(i).equals(currBranchAncestor.get(i))){
-                splitpointID = givenBranchAncestor.get(i);
-            } else {
-                break;
-            }
-        }
+        String splitpointID = getSplitpointId(givenbranchCommitID, currbranchCommitID);
+
 
         if (splitpointID.equals(givenbranchCommitID)) {
             Main.exitWithError("Given branch is an ancestor of the current branch.");
@@ -579,7 +597,8 @@ public class Repository {
                 }
             }
         }
-        setupCommit("Merged " + branchName + " into " + getCurrentBranch() + ".", readContentsAsString(givenbranch));
+        setupCommit("Merged " + branchName + " into "
+                + getCurrentBranch() + ".", readContentsAsString(givenbranch));
         if (count > 0){
             System.out.println("Encountered a merge conflict.");
         }
