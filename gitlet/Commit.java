@@ -1,24 +1,21 @@
 package gitlet;
 
-// TODO: any imports you need here
 
-import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 /**
  * Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
+ * Constructs Commit object with message, timestamp, parent commit 1 and 2,
+ * and a map of files contained in this commit.
+ * Used to construct commit tree.
  *
- * @author TODO
+ * @author Ziya Xu, Jingzhi Zhou.
  */
 public class Commit implements Serializable {
     /**
-     * TODO: add instance variables here.
+     *
      *
      * List all instance variables of the Commit class here with a useful
      * comment above them describing what that variable represents and how that
@@ -31,21 +28,24 @@ public class Commit implements Serializable {
     private String message;
 
     /**
-     *
+     * The time of when the Commit is made.
      */
     private Date timestamp;
 
     /**
-     *
+     * The ID of the parent commit.
      */
     private String parent;
 
+    /**
+     * The ID of the parent commit.
+     */
     private String parent2;
 
     private int level;
 
     /**
-     *
+     * A map of files contained in this commit.
      */
     private HashMap<String, String> fileHashMap;
 
@@ -56,7 +56,6 @@ public class Commit implements Serializable {
         fileHashMap = new HashMap<>();
         level = 0;
     }
-
     public Commit(String message, Date timestamp, String parent, HashMap<String, String> fileHashMap, int level) {
         this.message = message;
         this.timestamp = timestamp;
@@ -89,7 +88,7 @@ public class Commit implements Serializable {
         return parent2;
     }
 
-    public void addParent2(String parent2){
-        this.parent2 = parent2;
+    public void addParent2(String newParent) {
+        this.parent2 = newParent;
     }
 }

@@ -1,26 +1,27 @@
 package gitlet;
 
-import java.awt.*;
 import java.io.Serializable;
 
-public class Blob implements Serializable, Comparable <Blob>{
+public class Blob implements Serializable, Comparable<Blob> {
     private String filename;
     private String blobID;
 
-    public Blob(String filename, String blobID){
+    public Blob(String filename, String blobID) {
         this.filename = filename;
         this.blobID = blobID;
     }
 
-    public String getFilename(){
+    public String getFilename() {
         return filename;
     }
 
-    public String getBlobID(){
+    public String getBlobID() {
         return blobID;
     }
 
-    public void setBlobID(String a) {this.blobID = a; }
+    public void setBlobID(String a) {
+        this.blobID = a;
+    }
 
     @Override
     public int compareTo(Blob o) {

@@ -8,39 +8,40 @@ public class Head implements Serializable {
 
     private TrieSet idSet;
 
-    public Head(String commitID, String branchname){
+    public Head(String commitID, String branchname) {
         this.commitID = commitID;
         this.branchname = branchname;
         idSet = new TrieSet();
         idSet.add(commitID);
     }
-    public String getCommitID(){
+
+    public String getCommitID() {
         return commitID;
     }
 
-    public String getBranch(){
-        return branchname;
-    }
-
-    public TrieSet getIdSet(){
-        return idSet;
-    }
-
-    public void setCommitID(String newID){
+    public void setCommitID(String newID) {
         this.commitID = newID;
     }
 
-    public void addCommitID(String newID){
+    public String getBranch() {
+        return branchname;
+    }
+
+    public TrieSet getIdSet() {
+        return idSet;
+    }
+
+    public void addCommitID(String newID) {
         idSet.add(newID);
     }
 
-    public void setBranchname(String branchname){
+    public void setBranchname(String branchname) {
         this.branchname = branchname;
     }
 
 
     @Override
-    public String toString(){
+    public String toString() {
         return commitID + "\r\n" + branchname;
     }
 

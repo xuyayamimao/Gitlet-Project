@@ -3,22 +3,17 @@ package gitlet;
 /**
  * Driver class for Gitlet, a subset of the Git version-control system.
  *
- * @author TODO
+ * @author Ziya Xu, Jingzhi Zhou
  */
 public class Main {
-
     /**
      * Usage: java gitlet.Main ARGS, where ARGS contains
      * <COMMAND> <OPERAND1> <OPERAND2> ...
      */
     public static void main(String[] args) {
-
         if (args.length == 0) {
             exitWithError("Please enter a command.");
         }
-
-
-
         String firstArg = args[0];
         switch (firstArg) {
             case "init" -> {
@@ -50,21 +45,7 @@ public class Main {
             }
             case "checkout" -> {
                 gitletExist();
-                if (args.length == 3) {
-                    if (!args[1].equals("--")){
-                        exitWithError("Incorrect operands.");
-                    }
-                    Repository.setupCheckout1(args[2]);
-                } else if (args.length == 4) {
-                    if (!args[2].equals("--")){
-                        exitWithError("Incorrect operands.");
-                    }
-                    Repository.setupCheckout2(args[1], args[3]);
-                } else if (args.length == 2){
-                    Repository.setupCheckout3(args[1]);
-                } else {
-                    exitWithError("Incorrect operands.");
-                }
+                checkouthelper(args);
             }
             case "rm" -> {
                 gitletExist();
@@ -134,6 +115,29 @@ public class Main {
     public static void gitletExist() {
         if (!Repository.GITLET_DIR.exists()) {
             exitWithError("Not in an initialized Gitlet directory.");
+        }
+    }
+
+    /**
+     * finish the checkout command according to the input args
+     *
+     * @param args the args come with the checkout command
+     */
+    public static void checkouthelper(String[] args) {
+        if (args.length == 3) {
+            if (!args[1].equals("--")) {
+                exitWithError("Incorrect operands.");
+            }
+            Repository.setupCheckout1(args[2]);
+        } else if (args.length == 4) {
+            if (!args[2].equals("--")) {
+                exitWithError("Incorrect operands.");
+            }
+            Repository.setupCheckout2(args[1], args[3]);
+        } else if (args.length == 2) {
+            Repository.setupCheckout3(args[1]);
+        } else {
+            exitWithError("Incorrect operands.");
         }
     }
 }
